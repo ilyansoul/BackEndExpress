@@ -5,8 +5,14 @@ const userSchema = mongoose.Schema({
     email : {type : String, required: true},
     password : {type : String, required: true},
     age : { type: Number},
-    // tel : {type : String, required: true},
-    admin : {type: Boolean}
+    tel : { type : Number},
+    picture : { type : String },
+    dob_day: { type : Date },
+    dob_month: { type : Date },
+    dob_year: { type : Date },
+    gender_identity: { type : String },
+    gender_interest: { type : String },
+    // admin : {type: Boolean}
     
 })
 

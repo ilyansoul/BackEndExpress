@@ -21,7 +21,8 @@ const mongoose = require('mongoose');
 const { request } = require('express');
 
 const User = require('./models/User')
-
+const multer = require('multer');
+app.use(express.static(public))
 
 var dbURL = process.env.DATABASE_URL;
 console.log(dbURL);
@@ -37,16 +38,50 @@ app.get('/', (req, res) => {
     res.json('Hello to my app')
 })
 
+const stockage = multer.diskStorage({
+    destination : (req , file , callback) => {
+        callback(null , 'public');
+    },
+    filename: (req , file , callback) => {
+        callback(null, Date.now() + '-' + file.originalname)
+    }
+})
 
+const upload = multer({stockage}).array('file')
 
+app.post('upload', function (req, res) {
 
+upload(req ,res => {
+
+    if(err) {
+        return res.status(500).json(err)
+    }
+        req.files.map(file => {
+            console.log(file);
+
+        })
+
+        return request.status(200).json(req.files)
+
+})
+})
 
 app.post('/api/signup', function (req, res) {
     console.log(req.body);
     const DataUser = new User({
         username: req.body.username,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password,10 )
+        password: bcrypt.hashSync(req.body.password,10 ),
+        age: req.body.age,
+        tel: req.body.tel,
+        picture: req.body.picture,
+        dob_day: req.body.dob_day,
+        dov_month: req.body.dov_month,
+        dob_year: req.body.dob_year,
+        gender_identity: req.body.gender_identity,
+        gender_interest: req.body.gender_interest
+
+
     })
     DataUser.save().then(() => {
         console.log('User saved');
@@ -74,6 +109,14 @@ app.post('/api/login', function(req, res) {
         res.cookie("access-token", accessToken, {maxAge: 60*60*24*30*12, httpsOnly:true})
 
         // res.render('UserPage', {data: user});
+        // res.json({username : user.username})
         res.redirect("http://localhost:3000/homepage")
     }).catch(err => {console.log(err)});
 });
+
+app.get('/allusers', function(req, res) {
+    User.find().then(data => {
+        res.json({data: data});
+    }).catch(err => {console.log(err)});
+    })
+
